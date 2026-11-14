@@ -1,0 +1,66 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/ball/Ball.tscn" id="1_ball"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(900, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform"]
+size = Vector2(260, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(24, 500)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_floor"]
+bg_color = Color(0.18, 0.22, 0.3, 1)
+
+[node name="BallTest" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 1152.0
+offset_bottom = 648.0
+color = Color(0.06, 0.08, 0.13, 1)
+mouse_filter = 2
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(576, 560)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="Visual" type="Panel" parent="Floor"]
+offset_left = -450.0
+offset_top = -20.0
+offset_right = 450.0
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_floor")
+mouse_filter = 2
+
+[node name="PlatformLeft" type="StaticBody2D" parent="."]
+position = Vector2(360, 430)
+rotation = -0.08
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformLeft"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="PlatformRight" type="StaticBody2D" parent="."]
+position = Vector2(790, 330)
+rotation = 0.08
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformRight"]
+shape = SubResource("RectangleShape2D_platform")
+
+[node name="LeftWall" type="StaticBody2D" parent="."]
+position = Vector2(24, 324)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="RightWall" type="StaticBody2D" parent="."]
+position = Vector2(1128, 324)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="Ball" parent="." instance=ExtResource("1_ball")]
+position = Vector2(300, 180)
