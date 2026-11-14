@@ -16,10 +16,14 @@ const MAX_DRAG := 200.0  # longer drags don't add more power
 var drag_start = null    # where the mouse was pressed (null = not aiming)
 var is_moving := false   # true from launch until the ball stops
 var still_time := 0.0    # how long the ball has been (almost) still
+var _visual_scale := Vector2.ONE
+var _was_touching := false
 
 
 func _draw() -> void:
+	draw_set_transform(Vector2.ZERO, 0.0, _visual_scale)
 	draw_circle(Vector2.ZERO, RADIUS, Color.WHITE)
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
 ## Teleports the ball and stops it. RigidBody2D is moved by the physics
@@ -52,6 +56,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _physics_process(delta: float) -> void:
+	var touching := get_contact_count() > 0
+	if touching and not _was_touching:
+		_squish_on_impact()
+	_was_touching = touching
+	queue_redraw()
+
 	# The ball counts as "at rest" after being slow for 0.3 seconds.
 	if is_moving:
 		if linear_velocity.length() < 10.0:
@@ -61,3 +71,9 @@ func _physics_process(delta: float) -> void:
 				came_to_rest.emit()
 		else:
 			still_time = 0.0
+
+
+func _squish_on_impact() -> void:
+	var impact_tween := create_tween()
+	impact_tween.tween_property(self, "_visual_scale", Vector2(1.2, 0.8), 0.06)
+	impact_tween.tween_property(self, "_visual_scale", Vector2.ONE, 0.18)
