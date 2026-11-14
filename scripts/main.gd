@@ -9,6 +9,7 @@ extends Node2D
 # nodes exist. $Name is a shortcut for get_node("Name").
 @onready var ball: RigidBody2D = $Ball
 @onready var spawn_point: Marker2D = $Level/SpawnPoint
+@onready var win_screen: CanvasLayer = $WinScreen
 
 
 func _ready() -> void:
@@ -17,6 +18,8 @@ func _ready() -> void:
 	ball.launched.connect(GameManager.add_stroke)
 	# When GameManager says the game is won, run our _on_game_won function.
 	GameManager.game_won.connect(_on_game_won)
+	# The win screen's Play Again button does the same thing as pressing R.
+	win_screen.play_again_pressed.connect(restart)
 	restart()
 
 
@@ -25,13 +28,12 @@ func restart() -> void:
 	ball.reset_to(spawn_point.global_position)
 	ball.input_enabled = true
 	GameManager.start_game()
-	# TODO (task 6): hide the win screen here.
+	win_screen.hide()
 
 
 func _on_game_won() -> void:
 	ball.input_enabled = false  # no more shots after winning
-	# TODO (task 6): show the win screen here instead of printing.
-	print("You won! Strokes: ", GameManager.stroke_count)
+	win_screen.show_results(GameManager.stroke_count, GameManager.elapsed_time)
 
 
 # _unhandled_input gets key and mouse events that no UI element used.
