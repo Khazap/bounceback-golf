@@ -1,0 +1,30 @@
+[gd_resource type="TileSet" format=3]
+
+[ext_resource type="Texture2D" path="res://art/tiles/grass.png" id="1_o7xia"]
+[ext_resource type="Texture2D" path="res://art/tiles/dirt.png" id="2_c2caw"]
+[ext_resource type="Texture2D" path="res://art/tiles/stone.png" id="3_8nnk8"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0k5j8"]
+texture = ExtResource("1_o7xia")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_318vr"]
+texture = ExtResource("2_c2caw")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_g5l2p"]
+texture = ExtResource("3_8nnk8")
+texture_region_size = Vector2i(32, 32)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
+
+[resource]
+tile_size = Vector2i(32, 32)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_0k5j8")
+sources/1 = SubResource("TileSetAtlasSource_318vr")
+sources/2 = SubResource("TileSetAtlasSource_g5l2p")
