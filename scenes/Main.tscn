@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/placeholder_ball.gd" id="2_ball"]
 [ext_resource type="Script" path="res://scripts/placeholder_goal.gd" id="3_goal"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="4_hud"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1152, 40)
@@ -95,3 +96,5 @@ shape = SubResource("CircleShape2D_ball")
 
 [node name="Camera2D" type="Camera2D" parent="Ball"]
 position_smoothing_enabled = true
+
+[node name="HUD" parent="." instance=ExtResource("4_hud")]
