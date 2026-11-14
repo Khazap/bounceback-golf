@@ -18,7 +18,7 @@ signal came_to_rest
 @export var launch_power: float = 6.0
 @export var min_drag: float = 8.0
 @export var max_drag: float = 200.0
-@export var pull_cooldown: float = 10.0
+@export var pull_cooldown: float = 0.1
 @export var invert_direction: bool = false
 
 @export_category("Rest")
@@ -126,7 +126,7 @@ func _draw() -> void:
 	if drag.length() < 1.0:
 		return
 
-	var direction := drag.normalized()
+	var direction := drag.normalized().rotated(-rotation)
 	if invert_direction:
 		direction = -direction
 
