@@ -111,6 +111,17 @@ const SLOPES := [
 	[Vector2(0, -268), Vector2(6, -262), Vector2(0, -262)],
 ]
 
+# Coins, as tile positions (x, row). Most sit just above a ledge. The three
+# at x=31 float in the Big Fall shaft: you only get those while falling.
+const COINS := [
+	Vector2i(18, -16), Vector2i(1, -21), Vector2i(30, -31), Vector2i(22, -42),  # Foothills
+	Vector2i(17, -53), Vector2i(1, -74), Vector2i(22, -88),                     # Canyon
+	Vector2i(31, -80), Vector2i(31, -120), Vector2i(31, -160),                  # inside the shaft
+	Vector2i(11, -123), Vector2i(19, -143), Vector2i(15, -171),                 # Cliffs
+	Vector2i(28, -208), Vector2i(34, -232),                                     # Big Fall
+	Vector2i(3, -254), Vector2i(23, -269),                                      # Summit
+]
+
 # The hole: these cells are left empty in the summit so the ball can drop in.
 const CUP_CELLS := [Vector2i(18, -284), Vector2i(19, -284)]
 
@@ -222,7 +233,18 @@ func build_level(tileset: TileSet) -> void:
 	goal.position = GOAL_POS
 	_add(level, goal)
 
-	# 6. A sign at the start. You never see the hole until you're close.
+	# 6. Coins, grouped under one "Coins" node to keep the scene tidy.
+	var coins := Node2D.new()
+	coins.name = "Coins"
+	_add(level, coins)
+	var coin_scene: PackedScene = load("res://scenes/level/Coin.tscn")
+	for i in COINS.size():
+		var coin: Node2D = coin_scene.instantiate()
+		coin.name = "Coin%d" % i
+		coin.position = (Vector2(COINS[i]) + Vector2(0.5, 0.5)) * TILE  # center of the tile
+		_add(coins, coin, level)
+
+	# 7. A sign at the start. You never see the hole until you're close.
 	var sign := Label.new()
 	sign.name = "StartSign"
 	sign.text = "The hole is up there somewhere.\n↑"

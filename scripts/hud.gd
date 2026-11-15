@@ -3,17 +3,34 @@ extends CanvasLayer
 ## A CanvasLayer draws on top of the game and ignores the camera, so the
 ## labels stay in the corners even when the camera follows the ball.
 
+## Main listens to this and does the actual Bounce Back.
+signal bounce_back_pressed
+
 @onready var strokes_label: Label = $StrokesLabel
+@onready var coins_label: Label = $CoinsLabel
+@onready var bounce_back_button: Button = $BounceBackButton
 @onready var time_label: Label = $TimeLabel
 
 
 func _ready() -> void:
-	# Update the stroke text whenever GameManager says the count changed.
+	# Update the texts whenever GameManager says a number changed.
 	GameManager.stroke_count_changed.connect(_on_stroke_count_changed)
-	_on_stroke_count_changed(GameManager.stroke_count)  # show the current value now
-	# The small Menu button (top right) goes back to the main menu.
-	# Its focus_mode is "none", so Space/Enter can't press it by accident.
+	GameManager.coins_changed.connect(_on_coins_changed)
+	_on_stroke_count_changed(GameManager.stroke_count)  # show the current values now
+	_on_coins_changed(GameManager.coins)
+	# The buttons' focus_mode is "none", so Space/Enter can't press them by accident.
 	$MenuButton.pressed.connect(_on_menu_pressed)
+	bounce_back_button.pressed.connect(bounce_back_pressed.emit)
+
+
+## Main calls this to grey out the button when Bounce Back isn't possible
+## (no coins, or no earlier shot to go back to).
+func set_bounce_back_enabled(enabled: bool) -> void:
+	bounce_back_button.disabled = not enabled
+
+
+func _on_coins_changed(count: int) -> void:
+	coins_label.text = "Coins: %d" % count
 
 
 func _on_menu_pressed() -> void:

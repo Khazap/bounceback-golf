@@ -9,7 +9,10 @@ const RATE := 22050  # samples per second (enough for retro-style sounds)
 
 
 func _initialize() -> void:
+	seed(1)  # same random noise every run, so the files come out identical
 	save("sfx_launch", sweep(220, 880, 0.18, "sine", 0.6))          # boing up
+	save("sfx_coin", concat([note(987.8, 0.06, "square", 0.3), note(1318.5, 0.18, "square", 0.3)]))  # "ba-ding"
+	save("sfx_bounceback", concat([sweep(900, 300, 0.12, "sine", 0.5), sweep(300, 1200, 0.2, "sine", 0.5)]))  # whoosh back
 	save("sfx_bounce", sweep(520, 160, 0.13, "triangle", 0.8))      # boing down
 	save("sfx_ready", concat([note(1318.5, 0.07, "sine", 0.5), note(1760, 0.22, "sine", 0.5)]))
 	save("sfx_click", note(1000, 0.04, "square", 0.25))

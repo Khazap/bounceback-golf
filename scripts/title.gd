@@ -7,9 +7,9 @@ const HOW_TO_TEXT := """• Wait for the gold ring around the dog (and the "ding
 • Every shot bounces at least twice. Landings are never safe.
 • Right-click or Esc cancels a shot.
 • The hole is at the very top. You won't see it until you're close.
-• Fall, and you climb back up. There are no checkpoints.
+• Grab coins. Bounce Back (button or B) spends 1 coin to put you back where you took your last shot, even mid-fall.
 
-R = restart    M = music on/off"""
+R = restart    B = Bounce Back    M = music on/off"""
 
 # TODO: put your names in, and the dog artist's name once you know it.
 const CREDITS_TEXT := """Bounceback Golf, made for the Hack Club Haven game jam.
