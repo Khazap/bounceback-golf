@@ -30,6 +30,9 @@ func _draw() -> void:
 
 func _on_body_entered(body: Node) -> void:
 	if body.is_in_group("ball") and visible:
+		# Bank first (pays into the shop wallet the first time ever), then
+		# add to this run's coins (for Bounce Back). The HUD shows both.
+		GameManager.bank_coin(name)
 		GameManager.add_coin()
 		AudioManager.play("coin")
 		hide()

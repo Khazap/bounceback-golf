@@ -24,7 +24,19 @@ const LEVELS := [
 		"blurb": "Just a mountain. Ice, jelly and mud all the way up."},
 ]
 
+## Ball skins for the shop. "id" is saved, so don't change it later.
+## To add one: put a square PNG in art/skins/ and add a line here.
+const SKINS := [
+	{"id": "dog", "name": "Dog", "path": "res://art/dog.png", "price": 0},
+	{"id": "smiley", "name": "Smiley", "path": "res://art/skins/smiley.png", "price": 5},
+	{"id": "golf", "name": "Golf Ball", "path": "res://art/skins/golf.png", "price": 10},
+	{"id": "beach", "name": "Beach Ball", "path": "res://art/skins/beach.png", "price": 15},
+	{"id": "basketball", "name": "Basketball", "path": "res://art/skins/basketball.png", "price": 25},
+]
+const FIRST_CLEAR_BONUS := 10  # wallet coins for finishing a level the first time
+
 const SAVE_PATH := "user://records.cfg"  # in the browser this is saved in the page's storage
+const PROFILE_PATH := "user://profile.cfg"  # wallet and skins
 
 ## Which level is being played (index into LEVELS). The level select sets it.
 var level_index: int = 0
@@ -43,9 +55,20 @@ var records := {}
 var _records_dirty := false  # records changed but not saved yet
 var _save_timer := 0.0
 
+## Shop stuff (saved in profile.cfg).
+## wallet = coins you can spend in the shop. A coin only pays into the
+## wallet the FIRST time you ever grab it ("banked"), so you can't farm
+## the same easy coins by restarting.
+var wallet: int = 0
+var owned_skins: Array = ["dog"]
+var equipped_skin: String = "dog"
+var banked_coins: Array = []  # e.g. ["tower/Coin3", "caves/Coin0"]
+var last_bonus: int = 0       # wallet coins earned by the last finish (for the win screen)
+
 
 func _ready() -> void:
 	_load_records()
+	_load_profile()
 
 
 func _process(delta: float) -> void:
@@ -123,6 +146,12 @@ func record_finish() -> Array:
 	var id: String = current_level().id
 	var beaten := []
 	var best_strokes = get_record(id, "strokes")
+	# No strokes record yet = first time finishing this level: pay the bonus.
+	last_bonus = 0
+	if best_strokes == null:
+		last_bonus = FIRST_CLEAR_BONUS
+		wallet += FIRST_CLEAR_BONUS
+		_save_profile()
 	if best_strokes == null or stroke_count < best_strokes:
 		_set_record(id, "strokes", stroke_count)
 		beaten.append("strokes")
@@ -132,6 +161,69 @@ func record_finish() -> Array:
 		beaten.append("time")
 	_save_records()
 	return beaten
+
+
+# --- Wallet and skins (the shop) ----------------------------------------------
+
+## A coin calls this with its own name. Pays 1 into the wallet only the first
+## time that coin is ever collected. Returns true if it paid.
+func bank_coin(coin_name: String) -> bool:
+	var key: String = current_level().id + "/" + coin_name
+	if key in banked_coins:
+		return false
+	banked_coins.append(key)
+	wallet += 1
+	_save_profile()
+	return true
+
+
+func get_skin(id: String) -> Dictionary:
+	for skin in SKINS:
+		if skin.id == id:
+			return skin
+	return SKINS[0]
+
+
+## The picture of the skin you're wearing (the Ball and the menu use this).
+func equipped_skin_texture() -> Texture2D:
+	return load(get_skin(equipped_skin).path)
+
+
+## Buys a skin with wallet coins. Returns false if you can't afford it.
+func buy_skin(id: String) -> bool:
+	var price: int = get_skin(id).price
+	if id in owned_skins or wallet < price:
+		return false
+	wallet -= price
+	owned_skins.append(id)
+	equipped_skin = id  # wear it right away
+	_save_profile()
+	return true
+
+
+func equip_skin(id: String) -> void:
+	if id in owned_skins:
+		equipped_skin = id
+		_save_profile()
+
+
+func _load_profile() -> void:
+	var file := ConfigFile.new()
+	if file.load(PROFILE_PATH) != OK:
+		return  # first time playing: default profile
+	wallet = file.get_value("profile", "wallet", 0)
+	owned_skins = file.get_value("profile", "owned_skins", ["dog"])
+	equipped_skin = file.get_value("profile", "equipped_skin", "dog")
+	banked_coins = file.get_value("profile", "banked_coins", [])
+
+
+func _save_profile() -> void:
+	var file := ConfigFile.new()
+	file.set_value("profile", "wallet", wallet)
+	file.set_value("profile", "owned_skins", owned_skins)
+	file.set_value("profile", "equipped_skin", equipped_skin)
+	file.set_value("profile", "banked_coins", banked_coins)
+	file.save(PROFILE_PATH)
 
 
 func _set_record(level_id: String, key: String, value) -> void:

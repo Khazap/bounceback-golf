@@ -37,6 +37,8 @@ func show_results(strokes: int, time_seconds: float, beaten: Array = []) -> void
 		%RecordLabel.text = best_line
 	else:
 		%RecordLabel.text = "NEW RECORD! (" + " + ".join(beaten) + ")\n" + best_line
+	if GameManager.last_bonus > 0:
+		%RecordLabel.text += "\nFirst clear! +%d coins for the shop" % GameManager.last_bonus
 	show()
 	play_again_button.grab_focus()  # so Enter works too
 

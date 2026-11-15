@@ -78,6 +78,10 @@ func _ready() -> void:
 	# body_entered fires whenever the ball touches something new.
 	# (It needs contact_monitor on, which Ball.tscn sets.)
 	body_entered.connect(_on_body_entered)
+	# Wear the skin chosen in the shop, scaled so it's always 40 pixels tall
+	# (a bit bigger than the 32-pixel physics circle, so it looks chunky).
+	dog.texture = GameManager.equipped_skin_texture()
+	dog.scale = Vector2.ONE * (40.0 / dog.texture.get_height())
 
 
 func _process(_delta: float) -> void:

@@ -35,7 +35,8 @@ func set_height(meters: int, best: int) -> void:
 
 
 func _on_coins_changed(count: int) -> void:
-	coins_label.text = "Coins: %d" % count
+	# count = coins this run (for Bounce Back); wallet = saved coins for the shop
+	coins_label.text = "Coins: %d    Wallet: %d" % [count, GameManager.wallet]
 
 
 func _on_menu_pressed() -> void:
