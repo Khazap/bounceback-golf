@@ -14,6 +14,11 @@ extends RigidBody2D
 ##   After that: hits faster than STOP_SPEED bounce hard (BOUNCE), slower
 ##   ones on flat ground stop dead. On slopes it never stops: it slides off.
 ##
+## Special surfaces:
+##   Ice (light blue)  - slippery, you only stop when almost still.
+##   Jelly (pink)      - flings you up at JELLY_SPEED every time you land on it.
+##   Mud (brown)       - sticky, stops you dead instantly. No bounces.
+##
 ## Main.tscn uses these (don't rename them):
 ##   signal launched, signal came_to_rest, var input_enabled, func reset_to()
 
@@ -38,6 +43,10 @@ const REST_TIME := 0.2      # how long it must be stopped before you can aim aga
 const MIN_BOUNCES := 2      # every shot bounces at least this many times
 const MIN_BOUNCE_SPEED := 320.0  # those forced bounces go up at least this fast (about 2 tiles high)
 
+# --- Special surfaces (the level builder decides where they are)
+const JELLY_SPEED := 1100.0  # jelly flings you up this fast (about 19 tiles high)
+const ICE_STOP_SPEED := 40.0 # on ice you only stop when nearly still, so you slide
+
 # --- Look and feel
 const MAX_STRETCH := 0.35   # how much the dog stretches at full power (35%)
 const SQUISH_SPEED := 250.0 # landing faster than this makes the dog squish
@@ -55,6 +64,7 @@ var still_time := 0.0          # how long the ball has been stopped
 var air_time := 0.0            # time since launch (so we don't stop it instantly)
 var bounces_left := 0          # forced bounces still to do for this shot
 var was_on_ground := false     # touching the ground last physics step?
+var was_on_jelly := false      # touching jelly last physics step?
 var last_velocity := Vector2.ZERO  # speed last physics frame (for squish and sound)
 var stretch_angle := 0.0       # which way the dog is being stretched
 var squish_tween: Tween
@@ -155,10 +165,39 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 
 	# Each contact has a "normal": the direction pointing away from the
 	# surface. Pointing up (y below -0.5) means we're on the ground, not a wall.
+	# We also check what we're touching: special surfaces are in a group
+	# called "ice", "jelly" or "mud" (the level builder puts them there).
 	var on_ground := false
+	var on_ice := false
+	var on_jelly := false
+	var on_mud := false
 	for i in state.get_contact_count():
 		if state.get_contact_local_normal(i).y < -0.5:
 			on_ground = true
+		var thing := state.get_contact_collider_object(i) as Node
+		if thing:
+			on_ice = on_ice or thing.is_in_group("ice")
+			on_jelly = on_jelly or thing.is_in_group("jelly")
+			on_mud = on_mud or thing.is_in_group("mud")
+
+	# Mud: sticky. Stop dead the moment we touch it (but not right after launching from it).
+	if on_mud and air_time > 0.15:
+		state.linear_velocity = Vector2.ZERO
+		state.angular_velocity = 0.0
+		bounces_left = 0
+		was_on_ground = on_ground
+		return
+
+	# Jelly: every time we land on it, it flings us up at JELLY_SPEED.
+	if on_jelly and not was_on_jelly and air_time > 0.05:
+		var jv := state.linear_velocity
+		jv.y = -JELLY_SPEED
+		state.linear_velocity = jv
+		was_on_jelly = true
+		was_on_ground = on_ground
+		AudioManager.play("jelly", 0.8, randf_range(0.9, 1.1))
+		return
+	was_on_jelly = on_jelly
 
 	# Forced bounces: the moment we land (not on ground -> on ground), if this
 	# shot still owes bounces, kick the ball back up at least MIN_BOUNCE_SPEED.
@@ -175,7 +214,9 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# Stop dead: no forced bounces left, slow, AND touching flat ground. (A
 	# normal with y < -0.9 is nearly straight up = flat. Slopes are steeper.)
 	# air_time > 0.15 so a weak shot isn't cancelled the moment it starts.
-	if bounces_left == 0 and air_time > 0.15 and state.linear_velocity.length() < STOP_SPEED:
+	# On ice we only stop when almost still, so you slide (maybe off the edge).
+	var stop_speed := ICE_STOP_SPEED if on_ice else STOP_SPEED
+	if bounces_left == 0 and air_time > 0.15 and state.linear_velocity.length() < stop_speed:
 		for i in state.get_contact_count():
 			if state.get_contact_local_normal(i).y < -0.9:
 				state.linear_velocity = Vector2.ZERO

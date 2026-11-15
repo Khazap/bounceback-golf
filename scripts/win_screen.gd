@@ -25,9 +25,18 @@ func _ready() -> void:
 
 
 ## Fills in the numbers and shows the overlay.
-func show_results(strokes: int, time_seconds: float) -> void:
+## `beaten` lists the records you just broke, e.g. ["strokes", "time"].
+func show_results(strokes: int, time_seconds: float, beaten: Array = []) -> void:
+	var id: String = GameManager.current_level().id
 	strokes_label.text = "Strokes: %d" % strokes
 	time_label.text = "Time: " + HUD.format_time(time_seconds)
+	# Second line: the best ever (which may be what you just did).
+	var best_line := "Best: %d strokes · %s" % [GameManager.get_record(id, "strokes", strokes),
+		HUD.format_time(GameManager.get_record(id, "time", time_seconds))]
+	if beaten.is_empty():
+		%RecordLabel.text = best_line
+	else:
+		%RecordLabel.text = "NEW RECORD! (" + " + ".join(beaten) + ")\n" + best_line
 	show()
 	play_again_button.grab_focus()  # so Enter works too
 

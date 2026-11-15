@@ -1,0 +1,175 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/level/Goal.tscn" id="1_gkuqb"]
+[ext_resource type="Script" path="res://scripts/goal.gd" id="2_4eirm"]
+[ext_resource type="PackedScene" path="res://scenes/level/Coin.tscn" id="3_8g6vs"]
+[ext_resource type="Script" path="res://scripts/coin.gd" id="4_xsy5o"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_4w70d"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_w8m62"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_wkkg2"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_gv8d8"]
+friction = 0.8
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_valfo"]
+friction = 0.02
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_u68v5"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_lhidt"]
+friction = 0.02
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_m2le8"]
+friction = 0.8
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_g7tvf"]
+friction = 0.02
+
+[node name="Level" type="Node2D" unique_id=1213707485]
+
+[node name="Mountain" type="StaticBody2D" parent="." unique_id=1039957290]
+physics_material_override = SubResource("PhysicsMaterial_4w70d")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Mountain" unique_id=268768587]
+polygon = PackedVector2Array(-960, 0, 0, 0, 64, -128, 384, -96, 448, -256, 736, -224, 832, -416, 1088, -384, 1152, -576, 1376, -544, 1472, -768, 1696, -736, 1760, -960, 1952, -928, 2048, -1184, 2240, -1152, 2304, -1408, 2464, -1408, 2560, -1696, 2752, -1664, 2816, -1952, 2976, -1920, 3072, -2240, 3232, -2240, 3296, -2560, 3456, -2528, 3552, -2880, 3712, -2848, 3776, -3200, 3904, -3200, 4000, -3584, 4160, -3552, 4256, -3936, 4320, -3936, 4320, -3904, 4384, -3904, 4384, -3936, 4480, -3936, 4480, -4512, 4640, -4576, 4768, -4384, 4768, 384, -960, 384)
+
+[node name="Look" type="Polygon2D" parent="Mountain" unique_id=78830493]
+color = Color(0.42, 0.37, 0.33, 1)
+polygon = PackedVector2Array(-960, 0, 0, 0, 64, -128, 384, -96, 448, -256, 736, -224, 832, -416, 1088, -384, 1152, -576, 1376, -544, 1472, -768, 1696, -736, 1760, -960, 1952, -928, 2048, -1184, 2240, -1152, 2304, -1408, 2464, -1408, 2560, -1696, 2752, -1664, 2816, -1952, 2976, -1920, 3072, -2240, 3232, -2240, 3296, -2560, 3456, -2528, 3552, -2880, 3712, -2848, 3776, -3200, 3904, -3200, 4000, -3584, 4160, -3552, 4256, -3936, 4320, -3936, 4320, -3904, 4384, -3904, 4384, -3936, 4480, -3936, 4480, -4512, 4640, -4576, 4768, -4384, 4768, 384, -960, 384)
+
+[node name="Snow" type="Line2D" parent="." unique_id=1202542454]
+points = PackedVector2Array(3456, -2525, 3552, -2877, 3712, -2845, 3776, -3197, 3904, -3197, 4000, -3581, 4160, -3549, 4256, -3933, 4320, -3933, 4320, -3901, 4384, -3901, 4384, -3933, 4480, -3933, 4480, -4509, 4640, -4573, 4768, -4381)
+default_color = Color(0.93, 0.95, 1, 1)
+
+[node name="LeftWall" type="StaticBody2D" parent="." unique_id=343658813]
+physics_material_override = SubResource("PhysicsMaterial_w8m62")
+
+[node name="Shape" type="CollisionPolygon2D" parent="LeftWall" unique_id=1167233877]
+polygon = PackedVector2Array(-1280, -6400, -960, -6400, -960, 384, -1280, 384)
+
+[node name="Look" type="Polygon2D" parent="LeftWall" unique_id=1007853491]
+color = Color(0.25, 0.24, 0.28, 1)
+polygon = PackedVector2Array(-1280, -6400, -960, -6400, -960, 384, -1280, 384)
+
+[node name="Surface_mud_3" type="StaticBody2D" parent="." unique_id=1613970360 groups=["mud"]]
+physics_material_override = SubResource("PhysicsMaterial_wkkg2")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_mud_3" unique_id=56576979]
+polygon = PackedVector2Array(1152, -582, 1376, -550, 1376, -536, 1152, -568)
+
+[node name="Look" type="Polygon2D" parent="Surface_mud_3" unique_id=931418706]
+color = Color(0.42, 0.28, 0.12, 1)
+polygon = PackedVector2Array(1152, -582, 1376, -550, 1376, -536, 1152, -568)
+
+[node name="Surface_jelly_5" type="StaticBody2D" parent="." unique_id=180850410 groups=["jelly"]]
+physics_material_override = SubResource("PhysicsMaterial_gv8d8")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_jelly_5" unique_id=932734865]
+polygon = PackedVector2Array(1760, -966, 1952, -934, 1952, -920, 1760, -952)
+
+[node name="Look" type="Polygon2D" parent="Surface_jelly_5" unique_id=13710905]
+color = Color(1, 0.45, 0.75, 1)
+polygon = PackedVector2Array(1760, -966, 1952, -934, 1952, -920, 1760, -952)
+
+[node name="Surface_ice_7" type="StaticBody2D" parent="." unique_id=1102557644 groups=["ice"]]
+physics_material_override = SubResource("PhysicsMaterial_valfo")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_ice_7" unique_id=1300494614]
+polygon = PackedVector2Array(2304, -1414, 2464, -1414, 2464, -1400, 2304, -1400)
+
+[node name="Look" type="Polygon2D" parent="Surface_ice_7" unique_id=628022985]
+color = Color(0.7, 0.92, 1, 1)
+polygon = PackedVector2Array(2304, -1414, 2464, -1414, 2464, -1400, 2304, -1400)
+
+[node name="Surface_mud_9" type="StaticBody2D" parent="." unique_id=83932280 groups=["mud"]]
+physics_material_override = SubResource("PhysicsMaterial_u68v5")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_mud_9" unique_id=648933396]
+polygon = PackedVector2Array(2816, -1958, 2976, -1926, 2976, -1912, 2816, -1944)
+
+[node name="Look" type="Polygon2D" parent="Surface_mud_9" unique_id=284584898]
+color = Color(0.42, 0.28, 0.12, 1)
+polygon = PackedVector2Array(2816, -1958, 2976, -1926, 2976, -1912, 2816, -1944)
+
+[node name="Surface_ice_10" type="StaticBody2D" parent="." unique_id=571339724 groups=["ice"]]
+physics_material_override = SubResource("PhysicsMaterial_lhidt")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_ice_10" unique_id=131042557]
+polygon = PackedVector2Array(3072, -2246, 3232, -2246, 3232, -2232, 3072, -2232)
+
+[node name="Look" type="Polygon2D" parent="Surface_ice_10" unique_id=2043968200]
+color = Color(0.7, 0.92, 1, 1)
+polygon = PackedVector2Array(3072, -2246, 3232, -2246, 3232, -2232, 3072, -2232)
+
+[node name="Surface_jelly_12" type="StaticBody2D" parent="." unique_id=625881203 groups=["jelly"]]
+physics_material_override = SubResource("PhysicsMaterial_m2le8")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_jelly_12" unique_id=1045273865]
+polygon = PackedVector2Array(3552, -2886, 3712, -2854, 3712, -2840, 3552, -2872)
+
+[node name="Look" type="Polygon2D" parent="Surface_jelly_12" unique_id=1299378324]
+color = Color(1, 0.45, 0.75, 1)
+polygon = PackedVector2Array(3552, -2886, 3712, -2854, 3712, -2840, 3552, -2872)
+
+[node name="Surface_ice_13" type="StaticBody2D" parent="." unique_id=2076501705 groups=["ice"]]
+physics_material_override = SubResource("PhysicsMaterial_g7tvf")
+
+[node name="Shape" type="CollisionPolygon2D" parent="Surface_ice_13" unique_id=762691407]
+polygon = PackedVector2Array(3776, -3206, 3904, -3206, 3904, -3192, 3776, -3192)
+
+[node name="Look" type="Polygon2D" parent="Surface_ice_13" unique_id=656038267]
+color = Color(0.7, 0.92, 1, 1)
+polygon = PackedVector2Array(3776, -3206, 3904, -3206, 3904, -3192, 3776, -3192)
+
+[node name="SpawnPoint" type="Marker2D" parent="." unique_id=2131985559]
+position = Vector2(-656, -24)
+
+[node name="Goal" type="Area2D" parent="." unique_id=659885990 instance=ExtResource("1_gkuqb")]
+position = Vector2(4352, -3912)
+script = ExtResource("2_4eirm")
+
+[node name="Coins" type="Node2D" parent="." unique_id=567249785]
+
+[node name="Coin0" type="Area2D" parent="Coins" unique_id=56067405 instance=ExtResource("3_8g6vs")]
+position = Vector2(592, -272)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin1" type="Area2D" parent="Coins" unique_id=1610636217 instance=ExtResource("3_8g6vs")]
+position = Vector2(1264, -592)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin2" type="Area2D" parent="Coins" unique_id=1686649636 instance=ExtResource("3_8g6vs")]
+position = Vector2(1872, -976)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin3" type="Area2D" parent="Coins" unique_id=655439718 instance=ExtResource("3_8g6vs")]
+position = Vector2(2384, -1456)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin4" type="Area2D" parent="Coins" unique_id=60043854 instance=ExtResource("3_8g6vs")]
+position = Vector2(2896, -1968)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin5" type="Area2D" parent="Coins" unique_id=1039138642 instance=ExtResource("3_8g6vs")]
+position = Vector2(3376, -2576)
+script = ExtResource("4_xsy5o")
+
+[node name="Coin6" type="Area2D" parent="Coins" unique_id=682791987 instance=ExtResource("3_8g6vs")]
+position = Vector2(3856, -3248)
+script = ExtResource("4_xsy5o")
+
+[node name="StartSign" type="Label" parent="." unique_id=1473412784]
+offset_left = -752.0
+offset_top = -174.0
+offset_right = -752.0
+offset_bottom = -174.0
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 1, 1, 0.8)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
+theme_override_constants/outline_size = 4
+text = "Just a mountain.
+Ice slides, jelly flings, mud sticks.
+→"

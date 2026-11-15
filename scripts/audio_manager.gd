@@ -17,6 +17,8 @@ const SOUNDS := {
 	"win": preload("res://audio/sfx_win.wav"),
 	"coin": preload("res://audio/sfx_coin.wav"),
 	"bounceback": preload("res://audio/sfx_bounceback.wav"),
+	"lava": preload("res://audio/sfx_lava.wav"),
+	"jelly": preload("res://audio/sfx_jelly.wav"),
 }
 const MUSIC := preload("res://audio/music_loop.wav")
 const MUSIC_VOLUME_DB := -8.0  # negative = quieter than the sound effects

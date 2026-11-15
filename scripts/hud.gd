@@ -29,6 +29,11 @@ func set_bounce_back_enabled(enabled: bool) -> void:
 	bounce_back_button.disabled = not enabled
 
 
+## Main calls this every frame with the current height and the saved best.
+func set_height(meters: int, best: int) -> void:
+	$HeightLabel.text = "Height: %d m   Best: %d m" % [meters, best]
+
+
 func _on_coins_changed(count: int) -> void:
 	coins_label.text = "Coins: %d" % count
 

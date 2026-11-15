@@ -8,6 +8,7 @@ const HOW_TO_TEXT := """• Wait for the gold ring around the dog (and the "ding
 • Right-click or Esc cancels a shot.
 • The hole is at the very top. You won't see it until you're close.
 • Grab coins. Bounce Back (button or B) spends 1 coin to put you back where you took your last shot, even mid-fall.
+• Surfaces: ice (light blue) slides, jelly (pink) flings you up, mud (brown) sticks. Lava sends you back to the start.
 
 R = restart    B = Bounce Back    M = music on/off"""
 
@@ -54,7 +55,36 @@ func _ready() -> void:
 	bob.tween_property(dog, "position:y", dog.position.y, 0.8).set_trans(Tween.TRANS_SINE)
 
 
+## Play opens the level list: one big button per level, with your records.
 func _on_play_pressed() -> void:
+	var list: VBoxContainer = %LevelList
+	for old in list.get_children():
+		old.queue_free()  # rebuild fresh each time, so records are up to date
+	for i in GameManager.LEVELS.size():
+		var info: Dictionary = GameManager.LEVELS[i]
+		var button := Button.new()
+		button.custom_minimum_size = Vector2(0, 70)
+		button.add_theme_font_size_override("font_size", 20)
+		button.text = "%s\n%s" % [info.name, _records_text(info.id)]
+		button.tooltip_text = info.blurb
+		button.pressed.connect(_start_level.bind(i))
+		button.pressed.connect(AudioManager.play.bind("click"))
+		list.add_child(button)
+	_show_panel("Choose a level", true)
+	list.get_child(0).grab_focus()
+
+
+func _records_text(id: String) -> String:
+	var height = GameManager.get_record(id, "height", 0)
+	var strokes = GameManager.get_record(id, "strokes")
+	if strokes == null:
+		return "Best height: %d m · not finished yet" % height
+	var time: float = GameManager.get_record(id, "time")
+	return "Best height: %d m · %d strokes · %d:%02d" % [height, strokes, int(time / 60.0), int(time) % 60]
+
+
+func _start_level(index: int) -> void:
+	GameManager.level_index = index
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")
 
 
@@ -74,10 +104,18 @@ func _update_toggle_labels() -> void:
 
 
 func _show_info(title: String, text: String) -> void:
-	%InfoTitle.text = title
 	%InfoText.text = text
-	info_overlay.show()
+	_show_panel(title, false)
 	%CloseButton.grab_focus()
+
+
+## Shows the pop-up with either the level list or a block of text.
+func _show_panel(title: String, show_levels: bool) -> void:
+	%InfoTitle.text = title
+	%LevelList.visible = show_levels
+	%InfoText.visible = not show_levels
+	%CloseButton.text = "Back" if show_levels else "Close"
+	info_overlay.show()
 
 
 func _close_info() -> void:

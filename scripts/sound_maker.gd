@@ -16,6 +16,8 @@ func _initialize() -> void:
 	save("sfx_bounce", sweep(520, 160, 0.13, "triangle", 0.8))      # boing down
 	save("sfx_ready", concat([note(1318.5, 0.07, "sine", 0.5), note(1760, 0.22, "sine", 0.5)]))
 	save("sfx_click", note(1000, 0.04, "square", 0.25))
+	save("sfx_lava", mix(sweep(0, 0, 0.5, "noise", 0.5), sweep(300, 60, 0.5, "square", 0.25)))  # tsssss + falling buzz
+	save("sfx_jelly", sweep(150, 700, 0.3, "sine", 0.8))  # big wobbly boing up
 	save("sfx_win", concat([note(523.3, 0.11, "square", 0.3), note(659.3, 0.11, "square", 0.3),
 		note(784, 0.11, "square", 0.3), note(1046.5, 0.5, "square", 0.3)]))
 	save("music_loop", make_music())
@@ -55,6 +57,13 @@ func concat(parts: Array) -> PackedFloat32Array:
 	var out := PackedFloat32Array()
 	for p in parts:
 		out.append_array(p)
+	return out
+
+
+## Plays two sounds at the same time (adds them together).
+func mix(a: PackedFloat32Array, b: PackedFloat32Array) -> PackedFloat32Array:
+	var out := a.duplicate()
+	_add(out, 0, b)
 	return out
 
 
