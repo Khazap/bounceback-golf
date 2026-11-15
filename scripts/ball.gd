@@ -24,6 +24,24 @@ const MIN_DRAG := 8.0       # tiny drags are ignored (counts as a misclick)
 const REST_SPEED := 10.0    # slower than this counts as "stopped"
 const REST_TIME := 0.3      # ...for this many seconds
 
+# --- Bounciness (0 = no bounce, 1 = bounces forever)
+# How bouncy the next hit is depends on how fast the ball is going:
+#   faster than CRASH_SPEED  -> BOUNCE_CRASH  big falls pinball around wildly
+#   faster than SETTLE_SPEED -> BOUNCE_NORMAL normal jump landings (the level
+#                                             was tested with this, so you can
+#                                             still land on ledges)
+#   slower                   -> BOUNCE_SETTLE tiny hops die out, so you can
+#                                             shoot again sooner
+# (0.9 on every hit was tried: then nothing can ever land on a ledge.)
+const BOUNCE_CRASH := 0.9
+const BOUNCE_NORMAL := 0.6
+const BOUNCE_SETTLE := 0.3
+const CRASH_SPEED := 900.0   # pixels per second
+const SETTLE_SPEED := 250.0
+# Top speed. Long falls would otherwise get so fast that the ball could skip
+# through a thin ledge in one frame. 1800 px/s = 30 px per frame, always safe.
+const MAX_SPEED := 1800.0
+
 # --- Look and feel
 const MAX_STRETCH := 0.35   # how much the dog stretches at full power (35%)
 const SQUISH_SPEED := 250.0 # landing faster than this makes the dog squish
@@ -61,6 +79,15 @@ func _process(_delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	last_velocity = linear_velocity
+	# Pick the bounciness for the next hit based on how fast we're going now.
+	var speed := linear_velocity.length()
+	var wanted := BOUNCE_SETTLE
+	if speed > CRASH_SPEED:
+		wanted = BOUNCE_CRASH
+	elif speed > SETTLE_SPEED:
+		wanted = BOUNCE_NORMAL
+	if physics_material_override.bounce != wanted:  # only touch it when it changes
+		physics_material_override.bounce = wanted
 	# Rest detection: slow for REST_TIME seconds in a row = stopped.
 	if not at_rest:
 		if linear_velocity.length() < REST_SPEED:
@@ -184,6 +211,7 @@ func reset_to(pos: Vector2) -> void:
 
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
+	state.linear_velocity = state.linear_velocity.limit_length(MAX_SPEED)
 	if reset_pending:
 		state.transform = Transform2D(0.0, reset_position)
 		state.linear_velocity = Vector2.ZERO

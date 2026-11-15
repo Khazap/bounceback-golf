@@ -4,15 +4,15 @@
 [ext_resource type="Texture2D" path="res://art/dog.png" id="2_dog"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_ball"]
+resource_local_to_scene = true
 friction = 0.2
-bounce = 0.6
+bounce = 0.9
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ball"]
 radius = 16.0
 
 [node name="Ball" type="RigidBody2D" groups=["ball"]]
 physics_material_override = SubResource("PhysicsMaterial_ball")
-continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 4
 script = ExtResource("1_ball")
