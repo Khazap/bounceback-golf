@@ -20,6 +20,8 @@ const MUSIC := preload("res://audio/music_loop.wav")
 const MUSIC_VOLUME_DB := -8.0  # negative = quieter than the sound effects
 
 var music_player: AudioStreamPlayer
+var music_on := true  # the main menu's Music button changes these
+var sound_on := true
 
 
 func _ready() -> void:
@@ -35,6 +37,8 @@ func _ready() -> void:
 
 ## Plays a sound effect once. volume: 1.0 = full, 0.5 = half. pitch: 1.0 = normal.
 func play(sound_name: String, volume: float = 1.0, pitch: float = 1.0) -> void:
+	if not sound_on:
+		return
 	var player := AudioStreamPlayer.new()
 	player.stream = SOUNDS[sound_name]
 	player.volume_db = linear_to_db(volume)
@@ -44,6 +48,15 @@ func play(sound_name: String, volume: float = 1.0, pitch: float = 1.0) -> void:
 	player.finished.connect(player.queue_free)  # delete it when it's done
 
 
+func set_music_on(on: bool) -> void:
+	music_on = on
+	music_player.stream_paused = not on
+
+
+func set_sound_on(on: bool) -> void:
+	sound_on = on
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_M:
-		music_player.stream_paused = not music_player.stream_paused
+		set_music_on(not music_on)

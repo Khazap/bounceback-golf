@@ -11,6 +11,14 @@ func _ready() -> void:
 	# Update the stroke text whenever GameManager says the count changed.
 	GameManager.stroke_count_changed.connect(_on_stroke_count_changed)
 	_on_stroke_count_changed(GameManager.stroke_count)  # show the current value now
+	# The small Menu button (top right) goes back to the main menu.
+	# Its focus_mode is "none", so Space/Enter can't press it by accident.
+	$MenuButton.pressed.connect(_on_menu_pressed)
+
+
+func _on_menu_pressed() -> void:
+	AudioManager.play("click")
+	get_tree().change_scene_to_file("res://scenes/ui/Title.tscn")
 
 
 func _on_stroke_count_changed(count: int) -> void:

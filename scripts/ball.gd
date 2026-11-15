@@ -9,9 +9,10 @@ extends RigidBody2D
 ##   Right-click or Esc while dragging cancels the shot.
 ##
 ## How it bounces:
-##   Hits faster than STOP_SPEED bounce hard (BOUNCE).
-##   Below STOP_SPEED, on flat ground, the ball stops dead.
-##   On slopes it doesn't stop: it slides off.
+##   After every shot, the first MIN_BOUNCES landings ALWAYS bounce up (at
+##   least MIN_BOUNCE_SPEED), so you can't stick a soft landing.
+##   After that: hits faster than STOP_SPEED bounce hard (BOUNCE), slower
+##   ones on flat ground stop dead. On slopes it never stops: it slides off.
 ##
 ## Main.tscn uses these (don't rename them):
 ##   signal launched, signal came_to_rest, var input_enabled, func reset_to()
@@ -34,6 +35,8 @@ const STOP_SPEED := 500.0   # slower than this (pixels/second) on flat ground = 
                             # (500 = hops lower than about 4 tiles stop instead)
 const MAX_SPEED := 1800.0   # top speed, so long falls never skip through a ledge
 const REST_TIME := 0.2      # how long it must be stopped before you can aim again
+const MIN_BOUNCES := 2      # every shot bounces at least this many times
+const MIN_BOUNCE_SPEED := 320.0  # those forced bounces go up at least this fast (about 2 tiles high)
 
 # --- Look and feel
 const MAX_STRETCH := 0.35   # how much the dog stretches at full power (35%)
@@ -50,6 +53,8 @@ var drag_start := Vector2.ZERO # where the mouse was pressed (world position)
 var at_rest := true            # true when the ball is stopped and can shoot
 var still_time := 0.0          # how long the ball has been stopped
 var air_time := 0.0            # time since launch (so we don't stop it instantly)
+var bounces_left := 0          # forced bounces still to do for this shot
+var was_on_ground := false     # touching the ground last physics step?
 var last_velocity := Vector2.ZERO  # speed last physics frame (for squish and sound)
 var stretch_angle := 0.0       # which way the dog is being stretched
 var squish_tween: Tween
@@ -122,6 +127,7 @@ func _launch() -> void:
 	at_rest = false
 	still_time = 0.0
 	air_time = 0.0
+	bounces_left = MIN_BOUNCES
 	apply_central_impulse(shot * POWER)
 	launched.emit()
 	AudioManager.play("launch", 0.5 + 0.5 * shot.length() / MAX_DRAG)
@@ -134,24 +140,47 @@ func _stop_aiming() -> void:
 
 # --- Physics: speed cap, stop dead, teleport --------------------------------
 
+## Runs every physics step, in this order:
+##   1. teleport (if reset_to was called)  2. speed cap
+##   3. forced bounce on landing           4. otherwise maybe stop dead
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	state.linear_velocity = state.linear_velocity.limit_length(MAX_SPEED)
-
-	# Stop dead: slow AND touching flat ground. (A normal pointing almost
-	# straight up, y < -0.9, means flat. Slopes are steeper, so you slide.)
-	# air_time > 0.15 so a weak shot isn't cancelled the moment it starts.
-	if air_time > 0.15 and state.linear_velocity.length() < STOP_SPEED:
-		for i in state.get_contact_count():
-			if state.get_contact_local_normal(i).y < -0.9:
-				state.linear_velocity = Vector2.ZERO
-				state.angular_velocity = 0.0
-				break
-
 	if reset_pending:
 		state.transform = Transform2D(0.0, reset_position)
 		state.linear_velocity = Vector2.ZERO
 		state.angular_velocity = 0.0
 		reset_pending = false
+		return
+
+	state.linear_velocity = state.linear_velocity.limit_length(MAX_SPEED)
+
+	# Each contact has a "normal": the direction pointing away from the
+	# surface. Pointing up (y below -0.5) means we're on the ground, not a wall.
+	var on_ground := false
+	for i in state.get_contact_count():
+		if state.get_contact_local_normal(i).y < -0.5:
+			on_ground = true
+
+	# Forced bounces: the moment we land (not on ground -> on ground), if this
+	# shot still owes bounces, kick the ball back up at least MIN_BOUNCE_SPEED.
+	# (Up is negative Y, so "at least this fast upward" = minf with a negative.)
+	if on_ground and not was_on_ground and bounces_left > 0 and air_time > 0.05:
+		var v := state.linear_velocity
+		v.y = minf(v.y, -MIN_BOUNCE_SPEED)
+		state.linear_velocity = v
+		bounces_left -= 1
+		was_on_ground = on_ground
+		return  # skip the stop check this step, or it would cancel the bounce
+	was_on_ground = on_ground
+
+	# Stop dead: no forced bounces left, slow, AND touching flat ground. (A
+	# normal with y < -0.9 is nearly straight up = flat. Slopes are steeper.)
+	# air_time > 0.15 so a weak shot isn't cancelled the moment it starts.
+	if bounces_left == 0 and air_time > 0.15 and state.linear_velocity.length() < STOP_SPEED:
+		for i in state.get_contact_count():
+			if state.get_contact_local_normal(i).y < -0.9:
+				state.linear_velocity = Vector2.ZERO
+				state.angular_velocity = 0.0
+				break
 
 
 ## Teleports the ball and stops it (used by Main for spawn, R and Play Again).
@@ -163,6 +192,7 @@ func reset_to(pos: Vector2) -> void:
 	_stop_aiming()
 	at_rest = true
 	still_time = 0.0
+	bounces_left = 0
 
 
 # --- Stretch while pulling ---------------------------------------------------

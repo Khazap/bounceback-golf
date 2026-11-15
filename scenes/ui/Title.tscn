@@ -1,6 +1,21 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/title.gd" id="1_title"]
+[ext_resource type="Texture2D" path="res://art/dog.png" id="2_dog"]
+[ext_resource type="Texture2D" path="res://art/tiles/grass.png" id="3_grass"]
+[ext_resource type="Texture2D" path="res://art/tiles/dirt.png" id="4_dirt"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+bg_color = Color(0.12, 0.14, 0.2, 1)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.96, 0.78, 0.37, 1)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
 [node name="Title" type="Control"]
 layout_mode = 3
@@ -11,7 +26,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_title")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="Sky" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -19,44 +34,185 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.12, 0.16, 0.24, 1)
+color = Color(0.45, 0.62, 0.82, 1)
 
-[node name="VBox" type="VBoxContainer" parent="."]
+[node name="Dirt" type="TextureRect" parent="."]
+texture_repeat = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -64.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("4_dirt")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Grass" type="TextureRect" parent="."]
+texture_repeat = 2
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -96.0
+offset_bottom = -64.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("3_grass")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Dog" type="TextureRect" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 110.0
+offset_top = 150.0
+offset_right = 430.0
+offset_bottom = 470.0
+pivot_offset = Vector2(160, 160)
+mouse_filter = 2
+texture = ExtResource("2_dog")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Menu" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 520.0
+offset_top = 20.0
+offset_right = 1120.0
+offset_bottom = 540.0
+theme_override_constants/separation = 8
+alignment = 1
+
+[node name="GameName" type="Label" parent="Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.96, 0.78, 0.37, 1)
+theme_override_colors/font_outline_color = Color(0.15, 0.1, 0.05, 1)
+theme_override_constants/outline_size = 12
+theme_override_font_sizes/font_size = 68
+text = "Bounceback Golf"
+horizontal_alignment = 1
+
+[node name="HowToPlay" type="Label" parent="Menu"]
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 0.6)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "Click and drag to aim, release to launch. Reach the hole at the top!"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="PlayButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+text = "Play"
+
+[node name="HowToButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "How to Play"
+
+[node name="MusicButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Music: On"
+
+[node name="SoundButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Sound: On"
+
+[node name="CreditsButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Credits"
+
+[node name="QuitButton" type="Button" parent="Menu"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(280, 46)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 22
+text = "Quit"
+
+[node name="InfoOverlay" type="ColorRect" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="InfoOverlay"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -160.0
-offset_right = 400.0
-offset_bottom = 160.0
+offset_left = -340.0
+offset_top = -230.0
+offset_right = 340.0
+offset_bottom = 230.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 28
-alignment = 1
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 
-[node name="GameName" type="Label" parent="VBox"]
+[node name="Margin" type="MarginContainer" parent="InfoOverlay/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 28
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 28
+theme_override_constants/margin_bottom = 20
+
+[node name="VBox" type="VBoxContainer" parent="InfoOverlay/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="InfoTitle" type="Label" parent="InfoOverlay/Panel/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.96, 0.78, 0.37, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 10
-theme_override_font_sizes/font_size = 72
-text = "Bounceback Golf"
+theme_override_font_sizes/font_size = 36
+text = "How to Play"
 horizontal_alignment = 1
 
-[node name="HowToPlay" type="Label" parent="VBox"]
+[node name="InfoText" type="Label" parent="InfoOverlay/Panel/Margin/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "Click and drag to aim, release to launch. Reach the hole at the top!"
-horizontal_alignment = 1
+size_flags_vertical = 3
+theme_override_font_sizes/font_size = 20
+text = "..."
 autowrap_mode = 3
 
-[node name="PlayButton" type="Button" parent="VBox"]
+[node name="CloseButton" type="Button" parent="InfoOverlay/Panel/Margin/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(220, 64)
+custom_minimum_size = Vector2(200, 46)
 layout_mode = 2
 size_flags_horizontal = 4
-theme_override_font_sizes/font_size = 32
-text = "Play"
+theme_override_font_sizes/font_size = 22
+text = "Close"
