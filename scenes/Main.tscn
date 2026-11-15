@@ -12,6 +12,7 @@ script = ExtResource("1_main")
 [node name="Level" parent="." instance=ExtResource("2_level")]
 
 [node name="Ball" parent="." instance=ExtResource("3_ball")]
+position = Vector2(144, -24)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 

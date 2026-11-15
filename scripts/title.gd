@@ -11,5 +11,6 @@ func _ready() -> void:
 
 
 func _on_play_pressed() -> void:
+	AudioManager.play("click")
 	# Swap the whole current scene (this title screen) for the game scene.
 	get_tree().change_scene_to_file("res://scenes/Main.tscn")

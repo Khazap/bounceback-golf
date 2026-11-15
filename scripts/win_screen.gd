@@ -19,6 +19,9 @@ func _ready() -> void:
 	# Pressing Play Again just passes the message on to Main.
 	play_again_button.pressed.connect(play_again_pressed.emit)
 	title_button.pressed.connect(_on_title_pressed)
+	# Both buttons make a click sound.
+	play_again_button.pressed.connect(AudioManager.play.bind("click"))
+	title_button.pressed.connect(AudioManager.play.bind("click"))
 
 
 ## Fills in the numbers and shows the overlay.
