@@ -2,12 +2,21 @@ extends SceneTree
 ## Level builder: writes scenes/level/Level.tscn from the layout below.
 ## It is a tool for us, not part of the game. Run it from a terminal:
 ##   Godot_console.exe --headless --path . --script res://scripts/level_builder.gd
-## Change the BLOCKS list, run it again, and Level.tscn is rebuilt.
-## (Painting tiles by hand in the editor also works, but re-running this
-## script overwrites hand-painted changes.)
+## Change the lists below, run it again, and Level.tscn is rebuilt.
+## (Don't hand-paint tiles in the editor: re-running this overwrites them.)
+##
+## THE CLIMB (one screen wide, about 15 screens tall):
+##   1. Foothills    - grassy ledges, small steps. Warm-up.
+##   2. Canyon       - dirt ledges on the left side, bigger steps.
+##   3. Cliffs       - tiny stone ledges, an overhang, a tilted fake ledge.
+##   4. The Big Fall - tiny ledges over an open shaft. Miss, and you drop
+##                     straight back down to the Foothills.
+##   5. Summit       - no catch ledges at all. The hole is at the very top,
+##                     and you can't see it until you're almost there.
 
 const TILE := 32
-const TOP := -185  # top row of the playable area (negative Y = up)
+const TOP := -300  # top row of the playable area (negative Y = up)
+const WIDTH := 36  # inside width in tiles: x goes 0..35 (one screen)
 
 # Materials. "earth" becomes grass on top and dirt underneath.
 const EARTH := "earth"
@@ -19,68 +28,97 @@ const SRC_DIRT := 1
 const SRC_STONE := 2
 
 # Every block is [x1, top_row, x2, bottom_row, material] in tiles.
-# x goes 0..53 inside the walls. Rows are negative going up.
-# "route" blocks are the intended path, in climbing order (used by tests).
+# Rows are negative going up (row -10 is 10 tiles above the floor).
 const BLOCKS := [
-	# --- Frame: floor, walls, ceiling (extra thick so the camera never shows the void)
-	[-18, 0, 71, 12, EARTH],
+	# Frame: floor, walls, ceiling (extra thick so the camera never shows the void)
+	[-18, 0, WIDTH + 17, 12, EARTH],
 	[-18, TOP, -1, 0, STONE],
-	[54, TOP, 71, 0, STONE],
-	[-18, TOP - 12, 71, TOP - 1, STONE],
-	# Low mound in the bottom right, just scenery
-	[44, -3, 53, -1, EARTH],
-	[48, -6, 53, -4, EARTH],
+	[WIDTH, TOP, WIDTH + 17, 0, STONE],
+	[-18, TOP - 12, WIDTH + 17, TOP - 1, STONE],
+	# The divider: splits the middle of the tower into the climb (left)
+	# and the Big Fall shaft (right). Its top is a ledge in section 4.
+	[25, -190, 26, -58, STONE],
 ]
 
-# The climb, bottom to top. Same format. Order matters (it's the route).
+# The climb, bottom to top, same format. Order matters: it's the path the
+# test simulation checks, one jump at a time.
 const ROUTE := [
-	# --- 1. Meadow: wide grassy ledges, small steps (5 tiles up)
-	[14, -5, 25, -3, EARTH],
-	[31, -10, 42, -8, EARTH],
-	[45, -15, 53, -13, EARTH],
-	[30, -20, 40, -18, EARTH],
-	[16, -25, 26, -23, EARTH],
-	[2, -30, 12, -28, EARTH],
-	[18, -35, 28, -33, EARTH],
-	[34, -40, 44, -38, EARTH],
-	# --- 2. Dirt canyon: narrower ledges, bigger steps (6-7 up), a pillar
-	[47, -46, 53, -44, EARTH],
-	[36, -53, 41, -51, EARTH],
-	[24, -60, 29, -50, EARTH],  # tall pillar, you land on its top
-	[12, -66, 17, -64, EARTH],
-	[0, -72, 5, -70, EARTH],
-	[11, -79, 16, -77, EARTH],
-	[23, -86, 28, -84, EARTH],
-	# --- 3. Stone cliffs: tiny ledges, an overhang, long falls if you miss
-	[36, -93, 39, -91, STONE],
-	[47, -100, 50, -98, STONE],
-	[36, -108, 39, -106, STONE],
-	[21, -114, 25, -112, STONE],
-	[9, -121, 12, -119, STONE],
+	# --- 1. Foothills (rise 5 per step)
+	[12, -5, 21, -3, EARTH],
+	[24, -10, 35, -8, EARTH],
+	[10, -15, 19, -13, EARTH],
+	[0, -20, 7, -18, EARTH],
+	[11, -25, 19, -23, EARTH],
+	[24, -30, 31, -28, EARTH],
+	[13, -35, 20, -33, EARTH],
+	[0, -40, 6, -38, EARTH],
+	[9, -46, 16, -44, EARTH],
+	# --- 2. Canyon (rise 6-7, left side only)
+	[14, -52, 20, -50, EARTH],
+	[3, -59, 8, -57, EARTH],
+	[13, -66, 18, -64, EARTH],
+	[0, -73, 4, -71, EARTH],
+	[10, -80, 15, -78, EARTH],
+	[19, -87, 24, -85, EARTH],
+	[7, -94, 12, -92, EARTH],
+	[0, -101, 3, -99, EARTH],
+	[9, -108, 14, -106, EARTH],
+	# --- 3. Cliffs (tiny stone ledges)
+	[19, -115, 22, -113, STONE],
+	[10, -122, 13, -120, STONE],
 	[0, -128, 3, -126, STONE],
-	[9, -135, 13, -133, STONE],
-	# --- 4. The chimney: squeeze in under its wall, zigzag up to the hole
-	[22, -141, 28, -139, STONE],
-	[32, -149, 37, -147, STONE],
-	[21, -157, 26, -155, STONE],
-	[32, -165, 37, -163, STONE],
-	[18, -173, 28, -171, STONE],  # summit (the hole is cut into it)
+	[8, -135, 11, -133, STONE],
+	[17, -142, 20, -140, STONE],
+	[6, -149, 9, -147, STONE],
+	[16, -156, 19, -154, STONE],
+	[5, -163, 8, -161, STONE],
+	[14, -170, 17, -168, STONE],
+	[21, -177, 24, -175, STONE],
+	[10, -184, 14, -182, STONE],
+	# --- 4. The Big Fall (ledges hanging over the open shaft)
+	[21, -192, 26, -190, STONE],  # top of the divider
+	[32, -199, 35, -197, STONE],
+	[27, -207, 29, -205, STONE],  # floating, 3 tiles wide
+	[32, -215, 35, -213, STONE],
+	[26, -223, 28, -221, STONE],  # floating, 3 tiles wide
+	[33, -231, 35, -229, STONE],
+	# --- 5. Summit (nothing catches you)
+	[22, -239, 25, -237, STONE],
+	[11, -246, 14, -244, STONE],
+	[2, -253, 5, -251, STONE],
+	[12, -261, 14, -259, STONE],
+	[22, -268, 24, -266, STONE],
+	[30, -275, 35, -273, STONE],
+	[14, -284, 24, -282, STONE],  # summit (the hole is cut into it)
 ]
 
-# Extra obstacles that are not ledges you need to stand on.
+# Extra blocks that are in the way rather than stood on.
 const OBSTACLES := [
-	[37, -117, 46, -116, STONE],  # overhang: no straight-up shot from below
-	[18, -170, 20, -145, STONE],  # chimney left wall (holds up the summit)
-	[38, -170, 40, -145, STONE],  # chimney right wall
+	[9, -130, 17, -129, STONE],  # overhang: forces a flat shot to the left
+]
+
+# Slippery rock slopes, as polygons in tile-corner coordinates
+# (point (x, y) is the top-left corner of tile x, y). No friction, so the
+# ball slides off them. They look like places to rest, but they aren't.
+const SLOPES := [
+	# Foothills: ramp on the right wall, throws overshoots back left
+	[Vector2(31, -20), Vector2(36, -26), Vector2(36, -20)],
+	# Cliffs: tilted "fake ledge" against the divider
+	[Vector2(19, -124), Vector2(25, -128), Vector2(25, -127), Vector2(19, -123)],
+	# Big Fall: wedge on the right wall, slides you into the shaft
+	[Vector2(31, -203), Vector2(36, -206), Vector2(36, -203)],
+	# Summit: wedge on the left wall
+	[Vector2(0, -268), Vector2(6, -262), Vector2(0, -262)],
 ]
 
 # The hole: these cells are left empty in the summit so the ball can drop in.
-const CUP_CELLS := [Vector2i(22, -173), Vector2i(23, -173)]
+const CUP_CELLS := [Vector2i(18, -284), Vector2i(19, -284)]
 
 const SPAWN_POS := Vector2(4 * TILE + 16, -24)
 # Goal sits at the bottom of the cup (center of the two cup cells).
-const GOAL_POS := Vector2(23 * TILE, -173 * TILE + 24)
+const GOAL_POS := Vector2(19 * TILE, -284 * TILE + 24)
 const SIGN_POS := Vector2(48, -160)
+const ROCK_COLOR := Color(0.25, 0.24, 0.28)
 
 
 func _initialize() -> void:
@@ -133,8 +171,7 @@ func build_level(tileset: TileSet) -> void:
 	var tiles := TileMapLayer.new()
 	tiles.name = "Tiles"
 	tiles.tile_set = tileset
-	level.add_child(tiles)
-	tiles.owner = level
+	_add(level, tiles)
 
 	# 1. Fill every block, remembering which material each cell is.
 	var cells := {}  # Vector2i -> material
@@ -153,32 +190,55 @@ func build_level(tileset: TileSet) -> void:
 			src = SRC_DIRT if cells.has(cell + Vector2i.UP) else SRC_GRASS
 		tiles.set_cell(cell, src, Vector2i.ZERO)
 
-	# 3. SpawnPoint (contract: direct child Marker2D named "SpawnPoint").
+	# 3. Slippery slopes: one StaticBody2D, each slope is a shape + a drawing.
+	var slopes := StaticBody2D.new()
+	slopes.name = "Slopes"
+	slopes.physics_material_override = PhysicsMaterial.new()
+	slopes.physics_material_override.friction = 0.0
+	_add(level, slopes)
+	for i in SLOPES.size():
+		var points := PackedVector2Array()
+		for p in SLOPES[i]:
+			points.append(p * TILE)
+		var shape := CollisionPolygon2D.new()
+		shape.name = "Shape%d" % i
+		shape.polygon = points
+		_add(slopes, shape, level)
+		var look := Polygon2D.new()
+		look.name = "Rock%d" % i
+		look.polygon = points
+		look.color = ROCK_COLOR
+		_add(slopes, look, level)
+
+	# 4. SpawnPoint (contract: direct child Marker2D named "SpawnPoint").
 	var spawn := Marker2D.new()
 	spawn.name = "SpawnPoint"
 	spawn.position = SPAWN_POS
-	level.add_child(spawn)
-	spawn.owner = level
+	_add(level, spawn)
 
-	# 4. The Goal at the bottom of the cup.
+	# 5. The Goal at the bottom of the cup.
 	var goal: Node2D = load("res://scenes/level/Goal.tscn").instantiate()
 	goal.name = "Goal"
 	goal.position = GOAL_POS
-	level.add_child(goal)
-	goal.owner = level
+	_add(level, goal)
 
-	# 5. A sign at the start. You never see the hole until you're close.
+	# 6. A sign at the start. You never see the hole until you're close.
 	var sign := Label.new()
 	sign.name = "StartSign"
 	sign.text = "The hole is up there somewhere.\n↑"
 	sign.position = SIGN_POS
 	sign.add_theme_font_size_override("font_size", 20)
 	sign.add_theme_color_override("font_color", Color(1, 1, 1, 0.75))
-	level.add_child(sign)
-	sign.owner = level
+	_add(level, sign)
 
 	var packed := PackedScene.new()
 	packed.pack(level)
 	var err := ResourceSaver.save(packed, "res://scenes/level/Level.tscn")
-	print("Level.tscn saved: ", err == OK, " (", cells.size(), " tiles)")
+	print("Level.tscn saved: ", err == OK, " (", cells.size(), " tiles, ", SLOPES.size(), " slopes)")
 	level.free()
+
+
+## Adds `child` under `parent` and marks it as part of the saved scene.
+func _add(parent: Node, child: Node, scene_root: Node = null) -> void:
+	parent.add_child(child)
+	child.owner = scene_root if scene_root else parent
